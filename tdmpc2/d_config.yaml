@@ -1,0 +1,133 @@
+defaults:
+    - override hydra/launcher: submitit_local
+
+# environment
+num_envs: 1
+task: reacher_hard
+obs: rgb
+flicker_prob: -1
+
+# evaluation
+checkpoint: ???
+eval_episodes: 10
+eval_freq: 50000
+
+# training
+implicit_lkn: 2 # 1 for true, 0 for false, 2 for QLKN
+alternate_train: 0 # 1 for true, 0 for false
+steps: 500_000
+batch_size: 16
+steps_per_update: 0.5
+truncated_steps: 10 # truncated BPTT to mitigate vanishing gradients
+reward_coef: 1.0
+value_coef: 1.0
+v_head_coef: 0.3
+action_coef: 0.5
+consistency_coef: 1.0
+observation_coef: 1.0
+rho: 0.99
+gae_lambda: 0.95
+dyn_min_log_std: -2.3
+eta: 1 # intrinsic reward scaling factor
+beta: 1e-2 # KL divergence scaling factor
+free_bit: 1.0
+kl_z_coef: 1.0
+vae_coef: 1.0
+categorical: true # true for categorical dynamics, false for Gaussian 
+unimix: 0.01
+wm_lr: 1e-4
+ac_lr: 3e-5
+weight_decay: 1e-4
+enc_lr_scale: 0.7
+fil_lr_scale: 0.1
+grad_clip_norm: 10
+tau: 0.01
+discount_denom: 5
+discount_min: 0.95
+discount_max: 0.995
+buffer_size: 1_000_000
+exp_name: default
+data_dir: ???
+
+# planning
+mpc: true
+iterations: 6
+num_samples: 64
+num_elites: 8
+num_pi_trajs: 6
+horizon: 64 # length of sampled trajectories from buffer for world model learning
+act_error_bound: 5.0 # upper bound for action error accumulated over time
+min_imag_horizon: 6
+imag_horizon: 16 # imaginary horizon for actor-critic learning
+plan_horizon: 16 # This is the minimum receding horizon length
+warmup: 0 # default is 1 as when o_0 comes in, a_minus_1 is not available
+temperature: 0.5
+gamma_depth: 0.97
+unc_beta: 1e-2
+ucb_percentage: 0.4 # When steps/total steps are larger than this, use ucb instead
+ucb_auto_ep_return: 10 # When eval episode return is larger, use ucb
+unc_sigma: 0.1 # Not used if not UCB
+num_gmms: 10
+num_dropout_passes: 1 # use this to remove epistemic uncertainty during trajectory rollouts
+
+# belief tracker TODO: Set log_std_min and max
+
+# actor
+log_std_min: -2.3 # std = 0.1
+log_std_max: 0 # std = 1.0
+max_std: 1.0
+min_std: 0.1
+absmax: 1.0
+entropy_coef: 3e-1 # if set to 1, from the cartpole training, during eval_rewards ~= 2 train_rewards, possibly meaning too much exploration?
+dynamics: false # Use dynamics for actor loss
+lam_min: 0.1
+lam_center: 0.5
+
+# critic
+num_bins: 101
+vmin: -10
+vmax: +10
+
+# architecture
+model_size: ???
+num_enc_layers: 2
+enc_dim: 64 # Note: This is only useful for state-based encoders
+num_channels: 32
+stoch_dim: 32
+discrete_dim: 32 # Note: stoch_dim in the continuous case (512) = stoch_dim (32) * discrete_dim (16) in the discrete case
+mlp_dim: 256
+latent_dim: 512   # tied to the image-encoder output dim
+task_dim: 0       # multitask only; kept for input-dim compatibility
+belief_rl: 1
+belief_dim: 512
+num_q: 5
+dropout: 0.01 # This is for Q
+dyn_dropout: 0.05 # This is for dynamics rollout
+simnorm_dim: 8
+
+# logging
+wandb_project: ???
+wandb_entity: ???
+wandb_silent: false
+enable_wandb: false
+save_csv: true
+save_freq: 50_000
+
+# misc
+save_video: true
+save_agent: true
+seed: 1
+
+# convenience (filled in by env / parser)
+work_dir: ???
+task_title: ???
+obs_shape: rgb
+action_dim: ???
+episode_length: ???
+seed_steps: ???
+bin_size: ???
+seed_train_percent: 1
+max_episode_steps: 500
+
+# speedups
+compile: true
