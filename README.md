@@ -19,7 +19,7 @@ For the full algorithmic and theoretical details see the paper.
 ## Repository Layout
 
 ```
-tdmpc2/
+elvis/
 ├── DMPC.py                       # agent: training loop, MPPI planner, AC losses
 ├── d_train.py                    # entry point (Hydra)
 ├── d_config.yaml                 # default hyperparameters
@@ -49,12 +49,13 @@ A reference Dockerfile is provided in `docker/`.
 
 ## Training
 
-Single-task online training on DMControl. Default task is `reacher_hard` with pixel observations:
+Single-task online training on DMControl with pixel observations. Default task is `reacher_hard`.
+
+Run from the repository root with the environment's Python interpreter and the training script's full path:
 
 ```bash
-cd tdmpc2
-python d_train.py task=walker_walk obs=state seed=1
-python d_train.py task=cheetah_run obs=rgb seed=1 num_envs=4
+<path/to/python> <path/to/repo>/elvis/d_train.py task=walker_walk seed=1
+<path/to/python> <path/to/repo>/elvis/d_train.py task=cheetah_run seed=1 num_envs=4
 ```
 
 Training writes checkpoints, CSV logs, and (optionally) videos to `logs/<task>/<seed>/<exp_name>/`.
@@ -64,18 +65,16 @@ Useful flags:
 | Flag                          | Default        | Notes                                                |
 | ----------------------------- | -------------- | ---------------------------------------------------- |
 | `task`                        | `reacher_hard` | DMControl task name                                  |
-| `obs`                         | `rgb`          | `rgb` or `state`                                     |
-| `num_envs`                    | `1`            | Vectorized envs (rgb only when `>1`)                 |
+| `num_envs`                    | `1`            | Vectorized envs                                       |
 | `steps`                       | `500_000`      | Total environment steps                              |
 | `compile`                     | `true`         | `torch.compile` on hot loops (PyTorch nightly)       |
-| `enable_wandb`                | `false`        | Log to Weights & Biases                              |
 | `save_video`                  | `true`         | Save eval rollouts                                   |
 | `num_gmms`                    | `10`           | Number of parallel MPPI modes                        |
 | `iterations`                  | `6`            | CEM iterations per planning step                     |
 | `num_samples` / `num_elites`  | `64` / `8`     | MPPI samples and elites **per mode**                 |
 | `plan_horizon` / `imag_horizon` | `16` / `16`  | Planning and imagination horizons                    |
 
-See `tdmpc2/d_config.yaml` for the full list.
+See `elvis/d_config.yaml` for the full list.
 
 ## Resuming
 
@@ -86,7 +85,7 @@ Training auto-resumes if a numeric checkpoint pair `<step>.pt` and `<step>.repla
 ```bibtex
 @inproceedings{elvis2026,
   title     = {ELVIS: Ensemble-Calibrated Latent Imagination for Long-Horizon Visual MPC},
-  author    = {...},
+  author    = {Yurui Du, Pinhao Song, Yutong Hu, Renaud Detry},
   booktitle = {Robotics: Science and Systems (RSS)},
   year      = {2026},
 }
@@ -100,4 +99,4 @@ The implementation builds on prior open-source work; see `LICENSE` for licensing
 
 ## License
 
-This project is released under the MIT License — see `LICENSE`.
+This project is released under the Apache-2.0 License — see `LICENSE`.
